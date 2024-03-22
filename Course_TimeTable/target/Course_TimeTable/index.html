@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function myfunction(clicked_id) {
+            for(var j=1;j<=20;j++){
+                document.getElementById(j).innerHTML = ""
+
+
+                //document.getElementById(j).style.visibility = "hidden";
+            }
+            for(i=1;i<=20;i++){
+                $.get("http://localhost:8080/Course_TimeTable_war_exploded/webapi/courses/getCoursesInSlot?dname=" + clicked_id + "&slotNo=" + i,function(response,temp) {
+
+                    var count = Object.keys(response).length;
+
+                    if (count !== 0) {
+                        //document.getElementById(response[0].slotNo).style.visibility = "none";
+                        var str = "";
+                        var obj = {};
+                        let name,cid_1,slot;
+                        for(var k=0;k<count;k++){
+                                name = response[k].name.toString();
+                                cid_1 = response[k].cid.toString();
+                                slot = response[k].slotNo.toString();
+                                //obj[k] = '<a onclick='+popup(response[k].slotNo,response[k].cid)+'>'+response[k].name+'</a><br>';
+                                obj[k] =     "<a onclick=\"javascript:popup('"+slot+"','"+cid_1+"')\">"+name+"</a><br>";
+                            str = str.concat(obj[k])
+                        }
+                        let xyz = response[0].name
+                        //alert(str);
+                        //document.getElementById(response[0].slotNo).innerHTML = '<a href = "#" onclick='+popup(response[0].slotNo,response[0].cid)+'>'+xyz+'</a>';
+                        document.getElementById(response[0].slotNo).innerHTML = str;
+
+                        //document.write(JSON.stringify(response[0]));
+                        let c_id = JSON.stringify(response[0].cid);
+                        let id = c_id[c_id.length-2];
+                        let id1 = parseInt(id)+7;
+                        //alert("E"+id);
+                        //alert("E"+id1);
+                        document.getElementById("E"+id).innerHTML = xyz;
+                        document.getElementById("E"+id1).innerHTML = response[0].facultyName;
+
+
+                    }
+
+                });
+            }
+        }
+
+        function popup(get_id,course){
+           // alert(course)
+            console.log(course);
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "http://localhost:8080/Course_TimeTable_war_exploded/webapi/courses/getStudentsEnrolled",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "text/plain"
+                },
+                "data": course,
+            }
+            $.ajax(settings).done(function (response_new) {
+                var modal = document.getElementById("myModal");
+                var btn = document.getElementById(get_id);
+                var span = document.getElementsByClassName("close")[0];
+                var count = Object.keys(response_new).length;
+              //  btn.onclick = function() {
+                    modal.style.display = "block";
+                    var x = document.createElement("TABLE");
+                    var attr = document.getElementById("modal-entry");
+                    x.setAttribute("id", "myTable");
+                    attr.appendChild(x);
+                    var table = document.getElementById("myTable");
+                   // var row = table.insertRow(0);
+                    var header = table.createTHead();
+                    var row = header.insertRow(0);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    cell1.innerHTML = "<b>Roll Number</b>";
+                    cell2.innerHTML = "<b>Name</b>";
+                    for(var i=0;i<count;i++){
+                        var row = table.insertRow(i+1);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+
+                        cell1.innerHTML = response_new[i].rollNo ;
+                        cell2.innerHTML = response_new[i].name;
+                    }
+               // }
+                span.onclick = function() {
+                    $("#myTable").remove();
+                    modal.style.display = "none";
+                }
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        $("#myTable").remove();
+                        modal.style.display = "none";
+                    }
+                }
+            });
+
+
+        }
+    </script>
+    <style>
+        table{
+            table-layout: auto;
+            width : 70%;
+            align-self: center;
+        }
+        td{
+            border: 1px solid black;
+            text-align: left;
+        }
+    </style>
+    <style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.navbar a {
+  float: left;
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown .dropbtn {
+  font-size: 16px; // CS103', name='Netw
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+.navbar a:hover, .dropdown:hover .dropbtn {
+  background-color: red;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+</style>
+<style>
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  background-color: #2196F3;
+  padding: 10px;
+}
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+</style>
+    <style>
+        .grid-container-1 {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            background-color: #2196F3;
+            padding: 10px;
+        }
+        .grid-item-1 {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+    <style>
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            padding-top: 100px; /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+        }
+
+        /* The Close Button */
+        .close {
+
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="navbar">
+  <div class="dropdown">
+    <button class="dropbtn">TimeTable 
+      <i class="fa fa-caret-down" ></i>
+    </button>
+    <div class="dropdown-content" id="dropdown">     
+    	<a id="iMtech CSE" onclick="myfunction(this.id)" onmouseover="" style="cursor: pointer;">iMtech CSE</a>
+      	<a id="Mtech CSE" onclick="myfunction(this.id)" onmouseover="" style="cursor: pointer;">Mtech CSE</a>
+      	<a  id="Mtech ECE" onclick="myfunction(this.id)" onmouseover="" style="cursor: pointer;">Mtech ECE</a>
+	 
+    </div>
+  </div> 
+</div>
+ <div class="grid-container" id="grid">
+      <div class="grid-item" id="slot0" ></div>
+      <div class="grid-item" id="slot1" >9:30-11:00</div>
+      <div class="grid-item" id="slot2" >11:15-12:45</div>
+      <div class="grid-item" id="slot3" >2:00-3:30</div>
+      <div class="grid-item" id="slot4" >3:45-5:15</div>
+
+      <div class="grid-item" id="Day1" >Monday</div>
+      <div class="grid-item" id="1" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">1</div>
+      <div class="grid-item" id="2" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">2</div>
+      <div class="grid-item" id="3" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">3</div>
+      <div class="grid-item" id="4" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">4</div>
+      
+      <div class="grid-item" id="Day2" >Tuesday</div>
+      <div class="grid-item" id="5" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">5</div>
+      <div class="grid-item" id="6" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">6</div>
+      <div class="grid-item" id="7" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">7</div>
+      <div class="grid-item" id="8" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">8</div>
+      
+      <div class="grid-item" id="Day3" >Wednesday</div>
+      <div class="grid-item" id="9" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">9</div>
+      <div class="grid-item" id="10" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">10</div>
+      <div class="grid-item" id="11" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">11</div>
+      <div class="grid-item" id="12" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">12</div>
+      
+      <div class="grid-item" id="Day4" >Thursday</div>
+      <div class="grid-item" id="13" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">13</div>
+      <div class="grid-item" id="14" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">14</div>
+      <div class="grid-item" id="15" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">15</div>
+      <div class="grid-item" id="16" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">16</div>
+      
+      <div class="grid-item" id="Day5" >Friday</div>
+      <div class="grid-item" id="17" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">17</div>
+      <div class="grid-item" id="18" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">18</div>
+      <div class="grid-item" id="19" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">19</div>
+      <div class="grid-item" id="20" title="Click to see list of students enrolled" onmouseover="" style="cursor: pointer;">20</div>
+
+</div>
+</div>
+<div class="grid-container-1" id="grid_1">
+    <div class="grid-item-1" id="cell0" ></div>
+    <div class="grid-item-1" id="Subject" >Subject</div>
+    <div class="grid-item-1" id="Professor" >Professor</div>
+
+    <div class="grid-item-1" id="cell1" >1</div>
+    <div class="grid-item-1" id="E1"></div>
+    <div class="grid-item-1" id="E8"></div>
+
+
+    <div class="grid-item-1" id="cell2" >2</div>
+    <div class="grid-item-1" id="E2"></div>
+    <div class="grid-item-1" id="E9"></div>
+
+
+    <div class="grid-item-1" id="cell3" >3</div>
+    <div class="grid-item-1" id="E3"></div>
+    <div class="grid-item-1" id="E10"></div>
+
+
+    <div class="grid-item-1" id="cell4" >4</div>
+    <div class="grid-item-1" id="E4"></div>
+    <div class="grid-item-1" id="E11"></div>
+
+
+    <div class="grid-item-1" id="cell5" >5</div>
+    <div class="grid-item-1" id="E5"></div>
+    <div class="grid-item-1" id="E12"></div>
+
+    <div class="grid-item-1" id="cell6" >6</div>
+    <div class="grid-item-1" id="E6"></div>
+    <div class="grid-item-1" id="E13"></div>
+
+    <div class="grid-item-1" id="cell7">7</div>
+    <div class="grid-item-1" id="E7"></div>
+    <div class="grid-item-1" id="E14"></div>
+
+
+</div>
+
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content" id="modal-entry">
+        <span class="close">&times;</span>
+
+        <div class="modal-body">
+            <h3 align="left">List of Students in given Subject</h3>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+
+</html>
